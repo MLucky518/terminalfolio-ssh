@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"io"
 
 	"github.com/creack/pty"
 	"github.com/gliderlabs/ssh"
