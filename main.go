@@ -9,13 +9,8 @@ import (
 )
 
 func main() {
+	// SSH handler runs `npm start` in terminalfolio
 	ssh.Handle(func(s ssh.Session) {
-		// Optional: log terminal size
-		term := ssh.Terminal(s)
-		if term != nil {
-			log.Printf("User terminal: %dx%d", term.Width, term.Height)
-		}
-
 		cmd := exec.Command("npm", "start")
 		cmd.Dir = "./terminalfolio"
 		cmd.Env = append(os.Environ(), "TERM=xterm-256color")
