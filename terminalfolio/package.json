@@ -7,7 +7,10 @@
   },
   "dependencies": {
     "ink": "^4.1.0",
-    "react": "^18.2.0"
+    "ink-text-input": "^5.0.1",
+    "ink-use-stdout-dimensions": "^1.0.5",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "tsx": "^4.7.0"
