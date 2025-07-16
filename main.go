@@ -1,39 +1,35 @@
 package main
 
 import (
-	"io"
 	"log"
 	"os"
 	"os/exec"
 
-	"github.com/creack/pty"
 	"github.com/gliderlabs/ssh"
 )
 
 func main() {
 	ssh.Handle(func(s ssh.Session) {
+		// Optional: log terminal size
+		term := ssh.Terminal(s)
+		if term != nil {
+			log.Printf("User terminal: %dx%d", term.Width, term.Height)
+		}
+
 		cmd := exec.Command("npm", "start")
 		cmd.Dir = "./terminalfolio"
 		cmd.Env = append(os.Environ(), "TERM=xterm-256color")
+		cmd.Stdin = s
+		cmd.Stdout = s
+		cmd.Stderr = s
 
-		// Start in a new PTY
-		ptmx, err := pty.Start(cmd)
-		if err != nil {
-			log.Printf("❌ PTY start failed: %v\n", err)
-			return
+		if err := cmd.Run(); err != nil {
+			log.Printf("❌ Failed to run npm start: %v\n", err)
 		}
-		defer func() {
-			_ = ptmx.Close()
-			_ = cmd.Process.Kill() // Ensure cleanup on exit
-		}()
-
-		// Sync data between SSH and PTY
-		go io.Copy(ptmx, s)
-		io.Copy(s, ptmx)
 	})
 
-	log.Println("🚀 Terminalfolio SSH server on port 2222")
-	if err := ssh.ListenAndServe("0.0.0.0:2222", nil, ssh.Terminal); err != nil {
-		log.Fatalf("❌ Failed to start SSH: %v", err)
+	log.Println("🚀 SSH Terminalfolio server running on port 2222...")
+	if err := ssh.ListenAndServe("0.0.0.0:2222", nil); err != nil {
+		log.Fatalf("❌ SSH server failed to start: %v\n", err)
 	}
 }
